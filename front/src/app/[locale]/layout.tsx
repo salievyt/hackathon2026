@@ -18,7 +18,7 @@ const jetBrainsMono = JetBrains_Mono({
 
 export const metadata = {
   title: 'Hackathon 2026',
-  description: 'The ultimate 48-hour coding marathon.',
+  description: 'The ultimate 72-hour coding marathon.',
 };
 
 export default async function LocaleLayout({

@@ -9,12 +9,12 @@
   },
   "Hero": {
     "title": "Build something that matters.",
-    "description": "Join the ultimate 48-hour coding marathon. Innovate, create, and compete for amazing prizes.",
+    "description": "Join the ultimate 72-hour coding marathon. Innovate, create, and compete for amazing prizes.",
     "cta": "Apply Now",
     "secondaryCta": "Learn More"
   },
   "Stats": {
-    "hours": "48H",
+    "hours": "72H",
     "hoursLabel": "Time to build",
     "participants": "100+",
     "participantsLabel": "Hackers",
@@ -62,7 +62,7 @@
   "Registration": {
     "eyebrow": "Apply",
     "title": "Ready to build?",
-    "description": "Secure your spot in the most exciting hackathon of 2026.",
+    "description": "Participation costs 2,000 KGS per team.",
     "name": "Full Name",
     "email": "Email Address",
     "role": "Primary Role",
@@ -93,7 +93,7 @@
     "q1q": "Who can participate?",
     "q1a": "Anyone aged 16 or older — developers, designers, product managers, and students. All skill levels are welcome.",
     "q2q": "How much does it cost to participate?",
-    "q2a": "Participation is completely free. We cover meals, workspace, and swag for all accepted participants.",
+    "q2a": "Participation costs 2,000 KGS per team. We cover meals, workspace, and swag for all accepted participants.",
     "q3q": "Do I need a team to apply?",
     "q3a": "No. You can apply solo and we will help you form a team at the start of the event, or bring your own team of up to 5 people.",
     "q4q": "What should I bring?",
@@ -104,7 +104,7 @@
     "q6a": "Projects are evaluated by our jury based on innovation, technical complexity, impact, and presentation."
   },
   "Footer": {
-    "tagline": "The ultimate 48-hour coding marathon. Build something that matters, learn from the best, and win amazing prizes.",
+    "tagline": "The ultimate 72-hour coding marathon. Build something that matters, learn from the best, and win amazing prizes.",
     "navigation": "Navigation",
     "about": "About",
     "tracks": "Tracks",
