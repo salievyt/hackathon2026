@@ -1,3 +1,4 @@
+from html import escape
 import json
 import os
 from datetime import timedelta
@@ -60,11 +61,30 @@ def webhook(request):
     query = update.get('widget_query')
     message = update.get('message', {})
     cmd = message.get('text', '').split()
+    actions = {'🚀 Подать заявку': '/register', 'Моя заявка': '/me',
+               'Условия участия': '/info', 'Статистика': '/stats'}
+    if message.get('text') in actions:
+        message['text'] = actions[message['text']]
+        cmd = [message['text']]
     try:
         if query and query.get('data') == 'stats':
             telegram_call(token, 'answerWidgetQuery', {
                 'widget_query_id': query['id'], 'data': json.dumps(statistics())})
-        elif cmd and cmd in (['/start'], ['/stats']) and message['chat']['type'] == 'private':
+        elif cmd == ['/start'] and message['chat']['type'] == 'private':
+            name = escape(message.get('from', {}).get('first_name', ''))
+            greeting = f'Привет, {name}!' if name else 'Привет!'
+            telegram_call(token, 'sendMessage', {
+                'chat_id': message['chat']['id'], 'parse_mode': 'HTML',
+                'text': f'{greeting} 👋\n\nДобро пожаловать на <b>EVO FLARE — хакатон в Оше</b>. '
+                        'За 72 часа ты вместе с командой придумаешь и соберёшь свой проект.\n\n'
+                        '🏆 Призовой фонд — <b>100 000 сомов</b>\n'
+                        'Участие — 2 000 сомов с команды. Можно подать заявку и одному.\n\n'
+                        'Нажми «🚀 Подать заявку», и я помогу зарегистрироваться.',
+                'reply_markup': {'keyboard': [[{'text': label} for label in row] for row in
+                                              (list(actions)[:2], list(actions)[2:])],
+                                 'resize_keyboard': True, 'one_time_keyboard': True},
+            })
+        elif cmd == ['/stats'] and message['chat']['type'] == 'private':
             data = statistics()
             try:
                 telegram_call(token, 'sendWidget', {
