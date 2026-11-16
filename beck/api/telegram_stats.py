@@ -16,6 +16,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
+from .bot_registration import handle_message
 from .models import Participant
 
 
@@ -63,7 +64,7 @@ def webhook(request):
         if query and query.get('data') == 'stats':
             telegram_call(token, 'answerWidgetQuery', {
                 'widget_query_id': query['id'], 'data': json.dumps(statistics())})
-        elif cmd and cmd[0] in ('/start', '/stats') and message['chat']['type'] == 'private':
+        elif cmd and cmd in (['/start'], ['/stats']) and message['chat']['type'] == 'private':
             data = statistics()
             try:
                 telegram_call(token, 'sendWidget', {
@@ -72,7 +73,7 @@ def webhook(request):
                     'public_data': json.dumps(data), 'width': 320,
                     'caption': f"EVO FLARE · Заявок на момент отправки: {data['total']}",
                     'reply_markup': {'inline_keyboard': [[{
-                        'text': 'Подать заявку', 'url': 'https://evoflare.deo-core.codes/ru#register'}]]},
+                        'text': 'Подать заявку в боте', 'url': 'https://t.me/evoflare_agent?start=register'}]]},
                 })
             except HTTPError as error:
                 if error.code not in (400, 404):
@@ -82,9 +83,15 @@ def webhook(request):
                     'text': f"EVO FLARE · Всего заявок: {data['total']}\nСегодня по Бишкеку: {data['days'][-1][1]}",
                     'reply_markup': {'inline_keyboard': [
                         [{'text': 'График за 7 дней', 'web_app': {'url': 'https://evoflare.deo-core.codes/api/telegram/chart/'}}],
-                        [{'text': 'Подать заявку', 'url': 'https://evoflare.deo-core.codes/ru#register'}],
+                        [{'text': 'Подать заявку в боте', 'url': 'https://t.me/evoflare_agent?start=register'}],
                     ]},
                 })
+        elif cmd and message['chat']['type'] == 'private':
+            if cmd == ['/start', 'register']:
+                message['text'] = '/register'
+            result = handle_message(message)
+            if result:
+                telegram_call(token, 'sendMessage', {'chat_id': message['chat']['id'], **result})
     except (URLError, TimeoutError):
         return HttpResponse(status=503)
     return HttpResponse(status=200)

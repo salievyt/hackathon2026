@@ -14,3 +14,12 @@ class Participant(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class BotRegistration(models.Model):
+    chat_id = models.BigIntegerField(primary_key=True)
+    participant = models.OneToOneField(Participant, null=True, on_delete=models.SET_NULL)
+    step = models.CharField(max_length=16, blank=True)
+    draft = models.JSONField(default=dict)
+    last_message = models.BigIntegerField(default=0)
+    last_reply = models.JSONField(default=dict)
