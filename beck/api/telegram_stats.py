@@ -100,7 +100,7 @@ def webhook(request):
                     raise
                 telegram_call(token, 'sendMessage', {
                     'chat_id': message['chat']['id'],
-                    'text': f"EVO FLARE · Всего заявок: {data['total']}\nСегодня по Бишкеку: {data['days'][-1][1]}",
+                    'text': f"EVO FLARE · Всего заявок: {data['total']}\nСегодня по времени Оша: {data['days'][-1][1]}",
                     'reply_markup': {'inline_keyboard': [
                         [{'text': 'График за 7 дней', 'web_app': {'url': 'https://evoflare.deo-core.codes/api/telegram/chart/'}}],
                         [{'text': 'Подать заявку в боте', 'url': 'https://t.me/evoflare_agent?start=register'}],

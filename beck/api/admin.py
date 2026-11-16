@@ -67,7 +67,7 @@ class ParticipantAdmin(admin.ModelAdmin):
             return format_html('<a href="https://t.me/{}" target="_blank" rel="noopener noreferrer">@{}</a>', obj.telegram, obj.telegram)
         return None
 
-    @admin.display(description='Поступила · Бишкек', ordering='created_at')
+    @admin.display(description='Поступила · Ош', ordering='created_at')
     def submitted(self, obj):
         return timezone.localtime(obj.created_at, ZoneInfo('Asia/Bishkek')).strftime('%d.%m.%Y · %H:%M')
 

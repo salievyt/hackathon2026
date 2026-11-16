@@ -5,7 +5,7 @@
 :root{color-scheme:light dark;font:16px system-ui}body{margin:0;padding:24px}main{max-width:32rem;margin:auto}h1{font-size:1.4rem;margin:0}strong{font-size:3.6rem}h2{font-size:1rem;margin-top:2rem}.row{display:grid;grid-template-columns:3rem 1fr 3rem;align-items:center;gap:.6rem;margin:1rem 0;font-variant-numeric:tabular-nums}.track{background:#8883;border-radius:6px;height:12px}.bar{background:#7280ff;border-radius:6px;height:100%}a{display:inline-block;padding:.7rem 1rem;background:#4353cf;color:white;border-radius:8px;text-decoration:none}
 </style></head><body><main>
 <h1>Заявки на EVO FLARE</h1><strong>{{ total }}</strong><div>Всего зарегистрировано</div>
-<h2>Заявки за 7 дней · Бишкек</h2>
+<h2>Заявки за 7 дней · Ош</h2>
 {% for day,count,width in rows %}<div class="row"><span>{{ day }}</span><div class="track"><div class="bar" style="width:{{ width }}%"></div></div><b>{{ count }}</b></div>{% endfor %}
 <a href="">Обновить график</a>
 </main></body></html>
