@@ -3,12 +3,14 @@ import os
 from datetime import timedelta
 from pathlib import Path
 from secrets import compare_digest
-from urllib.error import URLError
+from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
 
 from django.db.models import Count
 from django.db.models.functions import TruncDate
+from django.shortcuts import render
+from django.views.decorators.cache import never_cache
 from django.http import HttpResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
@@ -26,6 +28,14 @@ def statistics():
                   .annotate(n=Count('pk')).values_list('day', 'n'))
     return {'total': Participant.objects.count(),
             'days': [[day.strftime('%d.%m'), counts.get(day, 0)] for day in days]}
+
+
+@never_cache
+def chart(request):
+    data = statistics()
+    maximum = max(1, *(n for _, n in data['days']))
+    rows = [(day, n, round(100 * n / maximum)) for day, n in data['days']]
+    return render(request, 'telegram/chart.html', {'total': data['total'], 'rows': rows})
 
 
 def telegram_call(token, method, payload):
@@ -55,14 +65,26 @@ def webhook(request):
                 'widget_query_id': query['id'], 'data': json.dumps(statistics())})
         elif cmd and cmd[0] in ('/start', '/stats') and message['chat']['type'] == 'private':
             data = statistics()
-            telegram_call(token, 'sendWidget', {
-                'chat_id': message['chat']['id'], 'allow_queries': True,
-                'html': Path(__file__).with_name('stats_widget.html').read_text(),
-                'public_data': json.dumps(data), 'width': 320,
-                'caption': f"EVO FLARE · Заявок на момент отправки: {data['total']}",
-                'reply_markup': {'inline_keyboard': [[{
-                    'text': 'Подать заявку', 'url': 'https://evoflare.deo-core.codes/ru#register'}]]},
-            })
+            try:
+                telegram_call(token, 'sendWidget', {
+                    'chat_id': message['chat']['id'], 'allow_queries': True,
+                    'html': Path(__file__).with_name('stats_widget.html').read_text(),
+                    'public_data': json.dumps(data), 'width': 320,
+                    'caption': f"EVO FLARE · Заявок на момент отправки: {data['total']}",
+                    'reply_markup': {'inline_keyboard': [[{
+                        'text': 'Подать заявку', 'url': 'https://evoflare.deo-core.codes/ru#register'}]]},
+                })
+            except HTTPError as error:
+                if error.code not in (400, 404):
+                    raise
+                telegram_call(token, 'sendMessage', {
+                    'chat_id': message['chat']['id'],
+                    'text': f"EVO FLARE · Всего заявок: {data['total']}\nСегодня по Бишкеку: {data['days'][-1][1]}",
+                    'reply_markup': {'inline_keyboard': [
+                        [{'text': 'График за 7 дней', 'web_app': {'url': 'https://evoflare.deo-core.codes/api/telegram/chart/'}}],
+                        [{'text': 'Подать заявку', 'url': 'https://evoflare.deo-core.codes/ru#register'}],
+                    ]},
+                })
     except (URLError, TimeoutError):
         return HttpResponse(status=503)
     return HttpResponse(status=200)
