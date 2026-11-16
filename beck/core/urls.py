@@ -29,3 +29,17 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+else:
+    from django.http import FileResponse
+    from django.shortcuts import get_object_or_404
+    from django.core.files.base import ContentFile
+    from api.models import Upload
+
+    def media_file(request, name):
+        upload = get_object_or_404(Upload, pk=name)
+        response = FileResponse(ContentFile(bytes(upload.data)), filename=name)
+        response['Content-Security-Policy'] = "default-src 'none'; sandbox"
+        return response
+
+    urlpatterns += [path('media/<path:name>', media_file)]

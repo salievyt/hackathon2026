@@ -44,15 +44,15 @@ class Command(BaseCommand):
             flat = {}
             flatten('', data, flat)
 
-            created, updated = 0, 0
-            for key, value in flat.items():
-                _, was_created = Translation.objects.update_or_create(
-                    key=key,
-                    locale=locale,
-                    defaults={'value': value},
-                )
-                created += int(was_created)
-                updated += int(not was_created)
+            existing = set(Translation.objects.filter(locale=locale).values_list('key', flat=True))
+            created = len(flat.keys() - existing)
+            updated = len(flat) - created
+            Translation.objects.bulk_create(
+                [Translation(key=key, locale=locale, value=value) for key, value in flat.items()],
+                update_conflicts=True,
+                unique_fields=['key', 'locale'],
+                update_fields=['value', 'updated_at'],
+            )
 
             removed, _ = Translation.objects.filter(
                 locale=locale,

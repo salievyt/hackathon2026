@@ -37,3 +37,4 @@ __all__ = [
     'Track',
     'Translation',
 ]
+from .upload import Upload

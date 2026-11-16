@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -35,6 +35,11 @@ from .serializers import (
 class ParticipantViewSet(viewsets.ModelViewSet):
     queryset = Participant.objects.all()
     serializer_class = ParticipantSerializer
+
+    def get_permissions(self):
+        if self.action in ('create', 'count'):
+            return []
+        return [IsAdminUser()]
 
     @action(detail=False, methods=['get'])
     def count(self, request):

@@ -196,3 +196,26 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+
+import os
+
+if os.environ.get('DATABASE_URL') or os.environ.get('VERCEL'):
+    import dj_database_url
+
+    SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
+    DEBUG = False
+    ALLOWED_HOSTS = ['evoflare-api.vercel.app', 'evoflare.deo-core.codes',
+                     os.environ.get('VERCEL_URL', 'localhost')]
+    CSRF_TRUSTED_ORIGINS = ['https://evoflare.deo-core.codes', 'https://evoflare.vercel.app']
+    SESSION_COOKIE_SECURE = CSRF_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    CORS_ALLOW_ALL_ORIGINS = False
+    DATABASES = {'default': dj_database_url.parse(os.environ['DATABASE_URL'], ssl_require=True)}
+    MIDDLEWARE.insert(2, 'whitenoise.middleware.WhiteNoiseMiddleware')
+    STATIC_URL = '/static/'
+    STATIC_ROOT = BASE_DIR / 'staticfiles'
+    STORAGES = {
+        'default': {'BACKEND': 'api.storage.DatabaseStorage'},
+        'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
+    }
+    WHITENOISE_USE_FINDERS = True
