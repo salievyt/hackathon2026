@@ -1,3 +1,5 @@
+import re
+
 from rest_framework import serializers
 
 from api.models import (
@@ -21,9 +23,20 @@ from api.application.content import get_active_partner_packages, get_partner_ass
 
 
 class ParticipantSerializer(serializers.ModelSerializer):
+    telegram = serializers.CharField(max_length=100)
+
+    def validate_telegram(self, value):
+        match = re.fullmatch(
+            r'(?:@|(?:https?://)?t\.me/)?([a-z][a-z0-9_]{3,31})/?',
+            value, flags=re.IGNORECASE | re.ASCII,
+        )
+        if not match:
+            raise serializers.ValidationError('Enter a Telegram username or t.me profile link.')
+        return match.group(1)
+
     class Meta:
         model = Participant
-        fields = ['id', 'name', 'email', 'role', 'created_at']
+        fields = ['id', 'name', 'email', 'telegram', 'role', 'created_at']
 
 
 class SiteConfigSerializer(serializers.ModelSerializer):

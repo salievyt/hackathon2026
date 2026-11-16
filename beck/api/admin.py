@@ -24,18 +24,24 @@ from .models import (
 
 @admin.register(Participant)
 class ParticipantAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'email', 'role_badge', 'created_at')
+    list_display = ('id', 'name', 'email', 'telegram_link', 'role_badge', 'created_at')
     list_display_links = ('id', 'name')
     list_filter = ('role', 'created_at')
-    search_fields = ('name', 'email')
+    search_fields = ('name', 'email', 'telegram')
     ordering = ('-created_at',)
     date_hierarchy = 'created_at'
     list_per_page = 20
     readonly_fields = ('created_at',)
 
+    @admin.display(description='Telegram')
+    def telegram_link(self, participant):
+        if participant.telegram:
+            return format_html('<a href="https://t.me/{}">@{}</a>', participant.telegram, participant.telegram)
+        return None
+
     fieldsets = (
         ('Participant Information', {
-            'fields': ('name', 'email', 'role')
+            'fields': ('name', 'email', 'telegram', 'role')
         }),
         ('Metadata', {
             'fields': ('created_at',),

@@ -7,16 +7,19 @@ import { useTranslations } from 'next-intl';
 export function RegistrationSection() {
   const t = useTranslations('Registration');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
 
     const formData = new FormData(e.currentTarget);
     const data = {
       name: formData.get("name"),
       email: formData.get("email"),
+      telegram: formData.get("telegram"),
       role: formData.get("role"),
     };
 
@@ -29,9 +32,12 @@ export function RegistrationSection() {
 
       if (response.ok) {
         setSuccess(true);
+      } else {
+        const payload = await response.json();
+        setError(t(payload.error?.telegram ? 'telegramError' : 'submitError'));
       }
     } catch (error) {
-      console.error(error);
+      setError(t("submitError"));
     } finally {
       setLoading(false);
     }
@@ -56,6 +62,10 @@ export function RegistrationSection() {
                 <input required type="text" id="name" name="name" className="w-full px-4 py-3 rounded-md border border-border bg-canvas-soft text-ink text-body focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" />
               </div>
               <div>
+                <label className="block text-label text-ink mb-2" htmlFor="telegram">{t('telegram')}</label>
+                <input required type="text" autoCapitalize="none" spellCheck={false} maxLength={100} placeholder="@username / https://t.me/username" id="telegram" name="telegram" className="w-full px-4 py-3 rounded-md border border-border bg-canvas-soft text-ink text-body focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" />
+              </div>
+              <div>
                 <label className="block text-label text-ink mb-2" htmlFor="email">{t('email')}</label>
                 <input required type="email" id="email" name="email" className="w-full px-4 py-3 rounded-md border border-border bg-canvas-soft text-ink text-body focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" />
               </div>
@@ -69,6 +79,7 @@ export function RegistrationSection() {
                 </select>
               </div>
             </div>
+            {error && <p role="alert" className="mb-4">{error}</p>}
             <Button variant="primary" type="submit" className="w-full text-label text-on-dark" disabled={loading}>
               {loading ? "..." : t('submit')}
             </Button>

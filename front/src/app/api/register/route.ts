@@ -5,6 +5,7 @@ import { BACKEND_URL } from '@/lib/config';
 const registerSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
+  telegram: z.string().trim().min(1).max(100),
   role: z.string(),
 });
 

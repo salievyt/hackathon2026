@@ -71,7 +71,10 @@
     "roleDeveloper": "Developer",
     "roleDesigner": "Designer",
     "roleProduct": "Product Manager",
-    "roleStudent": "Student"
+    "roleStudent": "Student",
+    "telegram": "Telegram contact",
+    "telegramError": "Enter your Telegram username or t.me profile link.",
+    "submitError": "Could not submit your application. Check your details and try again."
   },
   "Cookie": {
     "text": "We use cookies to improve your experience, analyze site traffic, and remember your preferences.",
@@ -213,7 +216,7 @@
     "updated": "Last updated: August 15, 2026",
     "back": "← Back to Home",
     "s1Heading": "1. Information We Collect",
-    "s1Body": "When you register for the hackathon, we collect your name, email address, and primary role. We may also collect technical information such as your IP address and browser type to ensure the platform works correctly.",
+    "s1Body": "When you register for the hackathon, we collect your name, Telegram contact, email address, and primary role. We may also collect technical information such as your IP address and browser type to ensure the platform works correctly.",
     "s2Heading": "2. How We Use Your Information",
     "s2Body": "We use your information to process registrations, communicate important updates about the event, match you with mentors, and improve the overall experience.",
     "s3Heading": "3. Data Sharing",
