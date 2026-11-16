@@ -17,7 +17,8 @@ const jetBrainsMono = JetBrains_Mono({
 });
 
 export const metadata = {
-  title: 'Hackathon 2026',
+  title: 'EVO FLARE Hackathon 2026',
+  verification: {yandex: 'c81d7849fc3d208e'},
   description: 'The ultimate 72-hour coding marathon.',
 };
 

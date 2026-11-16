@@ -3,16 +3,16 @@ import { Link } from "@/i18n/routing";
 import { VisualProof } from "@/components/ui/visual-proof";
 import { CountdownTimer } from "@/components/ui/countdown-timer";
 
-export function HeroSection({ t }: { t: any }) {
+export function HeroSection({ t, title, description, date, start }: { t: any; title: string; description: string; date: string; start: string }) {
   return (
     <section className="bg-canvas min-h-[760px] pt-[96px] pb-[120px] px-8 flex flex-col justify-center items-center text-center">
       <div className="max-w-[1280px] mx-auto w-full flex flex-col items-center">
-        <div className="text-eyebrow text-primary mb-6">[HACKATHON 2026]</div>
+        <div className="text-eyebrow text-primary mb-6"><time dateTime={start}>{date} (UTC+6)</time></div>
         <h1 className="text-hero-display text-ink max-w-[920px] mb-6">
-          {t('title')}
+          {title}
         </h1>
         <p className="text-lead text-ink-muted max-w-[680px] mb-8">
-          {t('description')}
+          {description}
         </p>
         <div className="flex flex-col sm:flex-row gap-3 mt-8">
           <Link href="#register">

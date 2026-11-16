@@ -159,7 +159,7 @@ export function fetchConfig() {
 
 export async function fetchConfigClient(): Promise<SiteConfig | null> {
   try {
-    const res = await fetch(`${BACKEND_URL}/api/config/`);
+    const res = await fetch("/api/config/");
     if (!res.ok) return null;
     return (await res.json()) as SiteConfig;
   } catch (error) {
