@@ -1,3 +1,4 @@
+from api.telegram_stats import webhook
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
@@ -20,6 +21,7 @@ router = DefaultRouter()
 router.register(r'participants', ParticipantViewSet)
 
 urlpatterns = [
+    path('telegram/webhook/', webhook),
     path('', include(router.urls)),
     path('config/', ConfigView.as_view(), name='site-config'),
     path('i18n/<str:locale>/', I18nView.as_view(), name='i18n-messages'),

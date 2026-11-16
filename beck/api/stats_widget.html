@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ru"><meta charset="utf-8">
+<style>
+body{margin:12px;font-family:sans-serif}h2{margin:4px 0}p{margin:8px 0}
+.row{display:flex;align-items:center;gap:8px;margin:5px 0}
+.track{flex:1;height:8px;background:#8793a430;border-radius:4px}
+.bar{height:8px;border-radius:4px;background:var(--tg-theme-button-color,#4158d0)}
+</style>
+<h2>Заявки на EVO FLARE</h2>
+<strong id="total"></strong>
+<p>За последние 7 дней · Бишкек</p>
+<div id="chart"></div>
+<button id="refresh">Обновить</button><small id="error"></small>
+<script>
+const widget = window.TelegramWidget;
+function draw(data) {
+  document.getElementById('total').textContent = 'Всего: ' + data.total;
+  const chart = document.getElementById('chart');
+  chart.textContent = '';
+  const maximum = Math.max(1, ...data.days.map(day => day[1]));
+  for (const [date, count] of data.days) {
+    const row = document.createElement('div');
+    row.className = 'row';
+    const label = document.createElement('span');
+    label.textContent = date;
+    const track = document.createElement('div');
+    track.className = 'track';
+    const bar = document.createElement('div');
+    bar.className = 'bar';
+    bar.style.width = (100 * count / maximum) + '%';
+    track.appendChild(bar);
+    const number = document.createElement('strong');
+    number.textContent = String(count);
+    row.appendChild(label); row.appendChild(track); row.appendChild(number);
+    chart.appendChild(row);
+  }
+}
+function refresh() {
+  widget.request('stats').then(answer => {
+    draw(JSON.parse(answer.result));
+    document.getElementById('error').textContent = '';
+  }).catch(() => { document.getElementById('error').textContent = ' Попробуйте обновить позже'; });
+}
+draw(JSON.parse(widget.publicData));
+document.getElementById('refresh').addEventListener('click', refresh);
+widget.ready();
+refresh();
+</script></html>
