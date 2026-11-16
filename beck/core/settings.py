@@ -77,6 +77,7 @@ JAZZMIN_SETTINGS = {
     "search_model": ["api.Participant"],
     "show_ui_builder": False,
     "topmenu_links": [
+        {"name": "Заявки участников", "url": "admin:api_participant_changelist", "permissions": ["api.view_participant"]},
         {"name": "Home",  "url": "admin:index", "permissions": ["auth.view_user"]},
         {"name": "API Docs", "url": "/api/docs/", "new_window": True},
     ],

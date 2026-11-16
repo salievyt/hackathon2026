@@ -1,4 +1,8 @@
+from zoneinfo import ZoneInfo
+
 from django.contrib import admin
+from django.db.models import Count, Q
+from django.utils import timezone
 from django.utils.html import format_html
 
 from .models import (
@@ -24,47 +28,57 @@ from .models import (
 
 @admin.register(Participant)
 class ParticipantAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'email', 'telegram_link', 'role_badge', 'created_at')
-    list_display_links = ('id', 'name')
+    list_display = ('applicant', 'telegram_link', 'role_badge', 'submitted')
+    list_display_links = ('applicant',)
     list_filter = ('role', 'created_at')
     search_fields = ('name', 'email', 'telegram')
-    ordering = ('-created_at',)
-    date_hierarchy = 'created_at'
-    list_per_page = 20
+    search_help_text = 'Поиск по имени, почте или Telegram'
+    ordering = ('-created_at', '-pk')
+    list_per_page = 25
     readonly_fields = ('created_at',)
+    fieldsets = (
+        ('Контакты участника', {'fields': ('name', 'telegram', 'email')}),
+        ('Заявка', {'fields': ('role', 'created_at')}),
+    )
+    change_list_template = 'admin/participant_applications.html'
 
-    @admin.display(description='Telegram')
-    def telegram_link(self, participant):
-        if participant.telegram:
-            return format_html('<a href="https://t.me/{}">@{}</a>', participant.telegram, participant.telegram)
+    def changelist_view(self, request, extra_context=None):
+        response = super().changelist_view(request, extra_context)
+        context = getattr(response, 'context_data', None)
+        if context and 'cl' in context:
+            now = timezone.localtime(timezone.now(), ZoneInfo('Asia/Bishkek'))
+            midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
+            context['summary'] = self.get_queryset(request).aggregate(
+                total=Count('pk'), today=Count('pk', filter=Q(created_at__gte=midnight)),
+                reachable=Count('pk', filter=~Q(telegram='')),
+            )
+        return response
+
+    def get_search_results(self, request, queryset, search_term):
+        return super().get_search_results(request, queryset, search_term.strip().removeprefix('@'))
+
+    @admin.display(description='Участник', ordering='name')
+    def applicant(self, obj):
+        return format_html('<strong>{}</strong><small class="d-block text-muted">{}</small>', obj.name, obj.email)
+
+    @admin.display(description='Telegram', empty_value='Не указан')
+    def telegram_link(self, obj):
+        if obj.telegram:
+            return format_html('<a href="https://t.me/{}" target="_blank" rel="noopener noreferrer">@{}</a>', obj.telegram, obj.telegram)
         return None
 
-    fieldsets = (
-        ('Participant Information', {
-            'fields': ('name', 'email', 'telegram', 'role')
-        }),
-        ('Metadata', {
-            'fields': ('created_at',),
-            'classes': ('collapse',)
-        }),
-    )
+    @admin.display(description='Поступила · Бишкек', ordering='created_at')
+    def submitted(self, obj):
+        return timezone.localtime(obj.created_at, ZoneInfo('Asia/Bishkek')).strftime('%d.%m.%Y · %H:%M')
 
-    @admin.display(description='Role', ordering='role')
+    @admin.display(description='Роль', ordering='role')
     def role_badge(self, obj):
-        colors = {
-            'developer': '#4353FE',
-            'designer': '#E91E63',
-            'product': '#009688',
-            'student': '#FF9800',
+        roles = {
+            'developer': ('primary', 'Разработчик'), 'designer': ('info', 'Дизайнер'),
+            'product': ('success', 'Продакт'), 'student': ('secondary', 'Студент'),
         }
-        color = colors.get(obj.role, '#62677A')
-        return format_html(
-            '<span style="background-color: {}; color: white; padding: 4px 10px; '
-            'border-radius: 9999px; font-weight: 600; font-size: 12px; '
-            'font-family: monospace;">{}</span>',
-            color,
-            obj.role.upper(),
-        )
+        color, label = roles.get(obj.role, ('light', obj.role))
+        return format_html('<span class="badge badge-pill badge-{}">{}</span>', color, label)
 
 
 @admin.register(Translation)
